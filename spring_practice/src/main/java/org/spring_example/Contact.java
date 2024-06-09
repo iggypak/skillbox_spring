@@ -12,11 +12,8 @@ import org.springframework.stereotype.Component;
 @Setter
 public class Contact {
 
-    private String firstName;
+    private String name;
 
-    private String secondName;
-
-    private String surname;
 
     private String number;
 
@@ -28,6 +25,6 @@ public class Contact {
 
     @Override
     public String toString() {
-        return String.format("%s %s %s;%s;%s", firstName, surname, secondName, number, mail);
+        return String.format("%s;%s;%s", name, number, mail);
     }
 }
