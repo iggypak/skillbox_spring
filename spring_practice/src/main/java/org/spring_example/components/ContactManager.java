@@ -1,12 +1,14 @@
-package org.spring_example;
+package org.spring_example.components;
 
 import org.spring_example.exceptions.ContactAlreadyExistsException;
 import org.spring_example.exceptions.ContactValidationException;
 import org.spring_example.exceptions.NotExistsContactException;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.TreeMap;
 
+@Component
 public class ContactManager {
 
     private final static String DELIMITER = "(\\||;)";

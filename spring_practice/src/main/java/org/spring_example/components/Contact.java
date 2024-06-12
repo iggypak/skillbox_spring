@@ -1,4 +1,4 @@
-package org.spring_example;
+package org.spring_example.components;
 
 
 import lombok.Getter;

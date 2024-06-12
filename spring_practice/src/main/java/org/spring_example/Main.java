@@ -1,6 +1,6 @@
 package org.spring_example;
 
-import org.spring_example.config.DefaultAppConfig;
+import org.spring_example.components.ContactManager;
 import org.spring_example.exceptions.ContactAlreadyExistsException;
 import org.spring_example.exceptions.ContactValidationException;
 import org.spring_example.exceptions.NotExistsContactException;
@@ -18,16 +18,10 @@ import static java.lang.System.out;
 
 public class Main {
     public static void main(String[] args) {
-        ApplicationContext context = new AnnotationConfigApplicationContext(DefaultAppConfig.class);
+        ApplicationContext context = new AnnotationConfigApplicationContext(ProfileWorker.class);
         out.println("Дорогой пользователь!");
         ContactManager contactManager = null;
-        try {
-            contactManager = context.getBean(ProfileWorker.class).getContactManager();
-        } catch (ContactValidationException e) {
-            throw new RuntimeException(e);
-        } catch (ContactAlreadyExistsException e) {
-            throw new RuntimeException(e);
-        }
+        contactManager = (ContactManager) context.getBean("contactManager");
         showAllContacts(contactManager);
         out.println("Для работы принимаются следующие команды");
         boolean goahead = true;
