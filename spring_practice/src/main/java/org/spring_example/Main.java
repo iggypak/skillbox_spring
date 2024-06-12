@@ -13,11 +13,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Scanner;
 
+import static java.lang.System.out;
+
+
 public class Main {
     public static void main(String[] args) {
-        boolean isShowed = false;
         ApplicationContext context = new AnnotationConfigApplicationContext(DefaultAppConfig.class);
-        System.out.println("Дорогой пользователь, на данный момент в базе есть следующие контакты:");
+        out.println("Дорогой пользователь!");
         ContactManager contactManager = null;
         try {
             contactManager = context.getBean(ProfileWorker.class).getContactManager();
@@ -26,8 +28,8 @@ public class Main {
         } catch (ContactAlreadyExistsException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(contactManager);
-        System.out.println("Для работы принимаются следующие команды");
+        showAllContacts(contactManager);
+        out.println("Для работы принимаются следующие команды");
         boolean goahead = true;
         while (goahead){
             printMessage();
@@ -37,7 +39,7 @@ public class Main {
                 case 1:
                     try {
                         contactManager.addContact(scn.nextLine());
-                        System.out.println("Контакт добавлен");
+                        out.println("Контакт добавлен");
                     } catch (ContactValidationException e) {
                         System.err.println(e.getMessage());
                     } catch (ContactAlreadyExistsException e) {
@@ -47,7 +49,7 @@ public class Main {
                 case 2:
                     try {
                         contactManager.deleteById(scn.nextLine());
-                        System.out.println("Контакт удален");
+                        out.println("Контакт удален");
                     } catch (NotExistsContactException e) {
                         System.err.println(e.getMessage());
                     }
@@ -55,13 +57,17 @@ public class Main {
                 case 3:
                     try {
                         contactManager.updateContact(scn.nextLine());
-                        System.out.println("Контакт обновлен");
+                        out.println("Контакт обновлен");
                     } catch (ContactValidationException e) {
                         System.err.println(e.getMessage());
                     } catch (NotExistsContactException e) {
                         System.err.println(e.getMessage());
                     }
+                    break;
                 case 4:
+                    showAllContacts(contactManager);
+                    break;
+                case 5:
                     goahead = false;
                     try {
                         Files.write(Path.of("src/main/resources/contacts.list"),
@@ -69,7 +75,7 @@ public class Main {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    System.out.println("Работа завершена");
+                    out.println("Работа завершена");
                     break;
                 default:
                     System.err.println("Некорректный ввод.");
@@ -80,9 +86,15 @@ public class Main {
     }
 
     public static void printMessage(){
-        System.out.println("1 - ввод нового контакта в формате 'Ф. И. О. | Номер телефона | Адрес электронной почты'");
-        System.out.println("2 - удаление пользователя по email");
-        System.out.println("3 - редактирование пользователя в формате 'Ф. И. О. | Номер телефона | Адрес электронной почты' ");
-        System.out.println("4 - выход и сохранение изменений в базе");
+        out.println("1 - ввод нового контакта в формате 'Ф. И. О. | Номер телефона | Адрес электронной почты'");
+        out.println("2 - удаление пользователя по email");
+        out.println("3 - редактирование пользователя в формате 'Ф. И. О. | Номер телефона | Адрес электронной почты' ");
+        out.println("4 - вывод списка контактов");
+        out.println("5 - выход и сохранение текущего списка контактов");
+    }
+
+    public static void showAllContacts(ContactManager cm) {
+        out.println("на данный момент в базе есть следующие контакты:");
+        out.println(cm);
     }
 }
