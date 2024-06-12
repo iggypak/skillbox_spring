@@ -1,30 +1,64 @@
 package org.spring_example;
 
 import org.spring_example.components.ContactManager;
-import org.spring_example.configurators.InitConfigurator;
-import org.spring_example.configurators.ProdConfigurator;
 import org.spring_example.exceptions.ContactAlreadyExistsException;
 import org.spring_example.exceptions.ContactValidationException;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
-import javax.annotation.PostConstruct;
 
 @Configuration
 @ComponentScan("org.spring_example")
+@PropertySource("classpath:application.properties")
 public class ProfileWorker {
+    @Value("${init}")
+    private String initPathToContacts;
 
-    @Bean("contactManager")
+    @Value("${prod}")
+    private String pathToProdContacts;
+
     @Profile("prod")
-    public ContactManager getContactManager() throws ContactValidationException, ContactAlreadyExistsException {
-        return new ProdConfigurator().getContactManager();
+    @Bean("contactManager")
+    public ContactManager getContactManagerProd() {
+        return new ContactManager();
     }
 
-    @Bean("contactManager")
+
     @Profile("init")
-    public ContactManager getContactManagerInit() throws ContactValidationException, ContactAlreadyExistsException {
-        return new InitConfigurator().getContactManager();
+    @Bean("contactManager")
+    public ContactManager getContactManagerInit() {
+        ContactManager contactManager = new ContactManager();
+        List<String> contactsValue;
+
+        try {
+            contactsValue = Files.readAllLines(Path.of(initPathToContacts));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        for(String item: contactsValue){
+            try {
+                contactManager.addContact(item);
+            } catch (ContactValidationException e) {
+                System.err.println(e.getMessage());
+            } catch (ContactAlreadyExistsException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+        return contactManager;
+    }
+
+    @Bean("path")
+    public String pathToSave() {
+        return initPathToContacts;
+    }
+
+    @Bean("path")
+    public String pathToSaveProd(){
+        return pathToProdContacts;
     }
 }

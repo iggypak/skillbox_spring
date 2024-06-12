@@ -21,7 +21,8 @@ public class Main {
         ApplicationContext context = new AnnotationConfigApplicationContext(ProfileWorker.class);
         out.println("Дорогой пользователь!");
         ContactManager contactManager = null;
-        contactManager = (ContactManager) context.getBean("contactManager");
+        contactManager = context.getBean(ContactManager.class);
+        String path = (String) context.getBean("path");
         showAllContacts(contactManager);
         out.println("Для работы принимаются следующие команды");
         boolean goahead = true;
@@ -64,7 +65,7 @@ public class Main {
                 case 5:
                     goahead = false;
                     try {
-                        Files.write(Path.of("src/main/resources/contacts.list"),
+                        Files.write(Path.of(path),
                                 contactManager.toString().getBytes(StandardCharsets.UTF_8));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
