@@ -17,12 +17,13 @@ import static java.lang.System.out;
 
 
 public class Main {
+
+    private static final String PATH_TO_CONTACTS = "src/main/resources/init-contacts.list";
+
     public static void main(String[] args) {
-        ApplicationContext context = new AnnotationConfigApplicationContext(ProfileWorker.class);
+        ApplicationContext context = new AnnotationConfigApplicationContext(DefaultAppConfig.class);
         out.println("Дорогой пользователь!");
-        ContactManager contactManager = null;
-        contactManager = context.getBean(ContactManager.class);
-        String path = (String) context.getBean("path");
+        ContactManager contactManager = context.getBean(ContactManager.class);
         showAllContacts(contactManager);
         out.println("Для работы принимаются следующие команды");
         boolean goahead = true;
@@ -65,7 +66,7 @@ public class Main {
                 case 5:
                     goahead = false;
                     try {
-                        Files.write(Path.of(path),
+                        Files.write(Path.of(PATH_TO_CONTACTS),
                                 contactManager.toString().getBytes(StandardCharsets.UTF_8));
                     } catch (IOException e) {
                         throw new RuntimeException(e);

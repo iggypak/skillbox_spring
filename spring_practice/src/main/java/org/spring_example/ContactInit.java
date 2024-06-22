@@ -4,7 +4,12 @@ import org.spring_example.components.ContactManager;
 import org.spring_example.exceptions.ContactAlreadyExistsException;
 import org.spring_example.exceptions.ContactValidationException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,26 +17,27 @@ import java.util.List;
 
 
 @Configuration
-@ComponentScan("org.spring_example")
-@PropertySource("classpath:application.properties")
-public class ProfileWorker {
+@PropertySources(
+        value = {
+                @PropertySource("classpath:application-init.properties")
+        }
+)
+@Profile("init")
+public class ContactInit {
+
     @Value("${init}")
     private String initPathToContacts;
 
-    @Value("${prod}")
-    private String pathToProdContacts;
 
-    @Profile("prod")
-    @Bean("contactManager")
-    public ContactManager getContactManagerProd() {
-        return new ContactManager();
+    private ContactManager contactManager;
+
+    public ContactInit(ContactManager contactManager){
+        this.contactManager = contactManager;
     }
 
 
-    @Profile("init")
-    @Bean("contactManager")
-    public ContactManager getContactManagerInit() {
-        ContactManager contactManager = new ContactManager();
+    @PostConstruct
+    public void initContactManager(){
         List<String> contactsValue;
 
         try {
@@ -49,16 +55,8 @@ public class ProfileWorker {
                 System.err.println(e.getMessage());
             }
         }
-        return contactManager;
     }
 
-    @Bean("path")
-    public String pathToSave() {
-        return initPathToContacts;
-    }
 
-    @Bean("path")
-    public String pathToSaveProd(){
-        return pathToProdContacts;
-    }
+
 }
